@@ -170,7 +170,7 @@ export default function TasksPage() {
             return null;
           }
         })
-        .filter(Boolean)
+        .filter((month): month is string => month !== null)
     )
   ).sort();
 
@@ -235,14 +235,19 @@ export default function TasksPage() {
                   <SelectContent>
                     <SelectItem value="all">All Months</SelectItem>
                     {months.map((month) => {
-                      const [year, monthStr] = month.split('-');
-                      const date = new Date(parseInt(year), parseInt(monthStr) - 1, 1);
-                      return (
-                        <SelectItem key={month} value={month}>
-                          {format(date, 'MMMM yyyy')}
-                        </SelectItem>
-                      );
-                    })}
+                      try {
+                        const [year, monthStr] = month.split('-');
+                        const date = new Date(parseInt(year), parseInt(monthStr) - 1, 1);
+                        return (
+                          <SelectItem key={month} value={month}>
+                            {format(date, 'MMMM yyyy')}
+                          </SelectItem>
+                        );
+                      } catch (error) {
+                        console.error('Error parsing month:', error);
+                        return null;
+                      }
+                    }).filter(Boolean)}
                   </SelectContent>
                 </Select>
               </div>

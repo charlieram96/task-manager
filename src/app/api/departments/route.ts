@@ -5,23 +5,36 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const departments = await prisma.department.findMany({
+      include: {
+        documents: true
+      },
       orderBy: {
         name: 'asc'
       }
     });
     
-    // Parse JSON strings back to arrays
+    // Parse JSON strings back to arrays and format the response
     const parsedDepartments = departments.map(dept => {
       try {
         return {
-          ...dept,
-          overseers: JSON.parse(dept.overseers)
+          id: dept.id,
+          name: dept.name,
+          fullName: dept.fullName,
+          overseers: JSON.parse(dept.overseers),
+          documents: dept.documents,
+          createdAt: dept.createdAt,
+          updatedAt: dept.updatedAt
         };
       } catch (e) {
         console.error('Error parsing department overseers:', e);
         return {
-          ...dept,
-          overseers: []
+          id: dept.id,
+          name: dept.name,
+          fullName: dept.fullName,
+          overseers: [],
+          documents: dept.documents,
+          createdAt: dept.createdAt,
+          updatedAt: dept.updatedAt
         };
       }
     });
@@ -29,7 +42,7 @@ export async function GET() {
     return NextResponse.json(parsedDepartments);
   } catch (error) {
     console.error('Error fetching departments:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json({ error: 'Failed to fetch departments' }, { status: 500 });
   }
 }
 

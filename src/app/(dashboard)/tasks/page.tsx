@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { TaskTable } from '@/components/tasks/task-table';
-import { Task } from '@/lib/types';
+import { Task, Department } from '@/lib/types';
+import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { getAuthStatus } from '@/lib/auth';
 import {
@@ -12,17 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from 'date-fns';
 import { TaskForm } from '@/components/tasks/task-form';
 import { DepartmentDialog } from '@/components/tasks/department-dialog';
 import { Button } from '@/components/ui/button';
 import { Building2 } from 'lucide-react';
-
-interface Department {
-  id: string;
-  name: string;
-  overseers: string[];
-}
 
 interface TaskFilters {
   department: string;

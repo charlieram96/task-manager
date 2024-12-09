@@ -27,21 +27,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
+import { Task as TaskType, Department } from "@/lib/types";
 
-interface Department {
-  id: string;
-  name: string;
-  leaders: string[];
-}
-
-interface Task {
-  id: string;
-  description: string;
+interface Task extends Omit<TaskType, 'departments'> {
   departments?: string[];
   department?: string;
-  status: string;
-  dueDate: string;
-  notes?: string;
 }
 
 interface TaskEditDialogProps {

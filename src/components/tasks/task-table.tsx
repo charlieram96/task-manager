@@ -23,20 +23,11 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { TaskDetailsDialog } from './task-details-dialog';
 import { TaskEditDialog } from './task-edit-dialog';
+import { Task as TaskType, Department } from '@/lib/types';
 
-interface Task {
-  id: string;
-  description: string;
+interface Task extends Omit<TaskType, 'departments'> {
   departments?: string[];
   department?: string;
-  status: string;
-  dueDate: string;
-  notes?: string;
-}
-
-interface Department {
-  name: string;
-  leaders: string[];
 }
 
 interface TaskTableProps {

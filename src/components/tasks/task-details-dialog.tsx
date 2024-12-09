@@ -8,27 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Department, Task as TaskType } from "@/lib/types";
 
-interface Department {
-  id: string;
-  name: string;
-  overseers: string | Overseer[] | Overseer;  // This is a JSON string or an array/object of Overseer
-}
-
-interface Overseer {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-interface Task {
-  id: string;
-  description: string;
+interface Task extends Omit<TaskType, 'departments'> {
   departments?: string[];
   department?: string;
-  status: string;
-  dueDate: string;
-  notes?: string;
 }
 
 interface TaskDetailsDialogProps {
@@ -55,7 +39,7 @@ const statusLabels = {
 export function TaskDetailsDialog({ task, departments, open, onOpenChange }: TaskDetailsDialogProps) {
   if (!task) return null;
 
-  const getDepartmentOverseers = (deptName: string): Overseer[] => {
+  const getDepartmentOverseers = (deptName: string): TaskType['overseers'] => {
     const dept = departments.find(d => d.name === deptName);
     if (!dept) return [];
     

@@ -169,13 +169,13 @@ export default function MeetingsPage() {
                       <strong>Notes:</strong>
                       <div className="whitespace-pre-wrap">{meeting.notes}</div>
                     </div>
-                    <div className='text-sm'>
+                    <div className='text-sm' style={{ marginTop: '1rem' }}>
                       <strong>Action Items:</strong>
                       <ul className="list-disc list-inside space-y-1">
                         {meeting.actionItems.map((item) => (
-                          <li key={item.id} className="text-sm" style={{ marginTop: '0.2rem' }}>
+                          <li key={item.id} className="text-sm" style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
                             {item.description}
-                            <div className="text-xs text-muted-foreground ml-5">
+                            <div className="text-xs text-muted-foreground ml-5" style={{ marginTop: '0.3rem' }}>
                               Due: {format(new Date(item.dueDate), 'PPP')}
                             </div>
                             <div className="text-xs text-muted-foreground ml-5">

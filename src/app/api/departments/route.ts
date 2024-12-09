@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { de } from 'date-fns/locale';
 
 export async function GET() {
   try {
@@ -22,8 +23,7 @@ export async function GET() {
           fullName: dept.fullName,
           overseers: JSON.parse(dept.overseers),
           documents: dept.documents,
-          createdAt: dept.createdAt,
-          updatedAt: dept.updatedAt
+          actionItems: dept.actionItems,
         };
       } catch (e) {
         console.error('Error parsing department overseers:', e);
@@ -33,8 +33,7 @@ export async function GET() {
           fullName: dept.fullName,
           overseers: [],
           documents: dept.documents,
-          createdAt: dept.createdAt,
-          updatedAt: dept.updatedAt
+          actionItems: dept.actionItems,
         };
       }
     });

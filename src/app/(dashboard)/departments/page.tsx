@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Department, Overseer } from '@/lib/types';
+import { Department, Overseer, Document } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, Upload, FileText, Mail, Phone } from 'lucide-react';
@@ -30,36 +30,13 @@ import * as z from 'zod';
 import { DocumentUploadDialog } from '@/components/departments/document-upload-dialog';
 import { DepartmentSearch } from "@/components/departments/department-search";
 
-interface Department {
-  id: string;
-  name: string;
-  fullName: string;
-  overseers: Overseer[];
-  documents: any[];
-}
-
-interface Overseer {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-interface Document {
-  id: string;
-  name: string;
-  fileName: string;
-  contentType: string;
-  size: number;
-  uploadedAt: string;
-}
-
 const departmentSchema = z.object({
   name: z.string().min(1, 'Department name is required'),
   fullName: z.string().min(1, 'Department full name is required'),
   overseers: z.array(z.object({
-    name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Invalid email').min(1, 'Email is required'),
-    phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+    name: z.string().min(1, 'Overseer name is required'),
+    email: z.string().email('Invalid email address'),
+    phone: z.string().min(1, 'Phone number is required'),
   })),
 });
 

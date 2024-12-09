@@ -26,10 +26,11 @@ export default function DashboardPage() {
   }, []);
 
   const getTaskStats = () => {
-    const completed = tasks.filter(task => task.status === 'DONE').length;
-    const inProgress = tasks.filter(task => task.status === 'IN_PROGRESS').length;
-    const todo = tasks.filter(task => task.status === 'TODO').length;
-    return { completed, inProgress, todo };
+    const completed = tasks.filter(task => task.status === 'completed').length;
+    const inProgress = tasks.filter(task => task.status === 'in_progress').length;
+    const notStarted = tasks.filter(task => task.status === 'not_started').length;
+    const blocked = tasks.filter(task => task.status === 'blocked').length;
+    return { completed, inProgress, notStarted, blocked };
   };
 
   const stats = getTaskStats();
@@ -37,7 +38,7 @@ export default function DashboardPage() {
   return (
     <div className="h-full space-y-4">
       <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -49,26 +50,40 @@ export default function DashboardPage() {
             <div className="text-2xl font-bold">{stats.completed}</div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               In Progress
             </CardTitle>
-            <Clock className="h-4 w-4 text-blue-500" />
+            <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.inProgress}</div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Todo
+              Not Started
             </CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
+            <Clock className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.todo}</div>
+            <div className="text-2xl font-bold">{stats.notStarted}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Blocked
+            </CardTitle>
+            <AlertCircle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.blocked}</div>
           </CardContent>
         </Card>
       </div>

@@ -7,6 +7,7 @@ export interface Task {
   startDate: string;
   endDate: string;
   departments: string[];
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }

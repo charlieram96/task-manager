@@ -41,12 +41,7 @@ export default function TimelinePage() {
 
   const filteredTasks = selectedDepartment === 'all' 
     ? tasks 
-    : tasks.filter(task => {
-        if (Array.isArray(task.departments)) {
-          return task.departments.includes(selectedDepartment);
-        }
-        return task.department === selectedDepartment;
-      });
+    : tasks.filter(task => task.departments && task.departments.includes(selectedDepartment));
 
   return (
     <div className="h-full p-8 space-y-4">

@@ -1,4 +1,4 @@
-import { Task } from "@/lib/types";
+import { Task, Department } from "@/lib/types";
 import { eachMonthOfInterval, format, parseISO, isWithinInterval, isSameMonth, startOfMonth, endOfMonth, getDaysInMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -10,12 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-interface Department {
-  id: string;
-  name: string;
-  overseers: string[];
-}
 
 interface TimelineViewProps {
   tasks: Task[];

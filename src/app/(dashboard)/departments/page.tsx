@@ -191,8 +191,18 @@ export default function DepartmentsPage() {
       fetchDepartments();
       setDeleteDialogOpen(false);
       setDepartmentToDelete(null);
+      
+      toast({
+        title: 'Success',
+        description: 'Department deleted successfully',
+      });
     } catch (error) {
       console.error('Error deleting department:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete department',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -293,7 +303,10 @@ export default function DepartmentsPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(department)}
+                    onClick={() => {
+                      setDepartmentToDelete(department);
+                      setDeleteDialogOpen(true);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -547,7 +560,7 @@ export default function DepartmentsPage() {
               <Button
                 type="button"
                 variant="destructive"
-                onClick={handleDelete}
+                onClick={() => departmentToDelete && handleDelete(departmentToDelete)}
               >
                 Delete
               </Button>

@@ -74,8 +74,6 @@ export default function TimelinePage() {
             <div className="h-[calc(100vh-16rem)]">
               <TimelineView 
                 tasks={filteredTasks}
-                startDate={startDate}
-                endDate={endDate}
               />
             </div>
           )}

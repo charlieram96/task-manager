@@ -2,5 +2,12 @@
   "extends": ["next/core-web-vitals"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
-  "root": true
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  }
 }

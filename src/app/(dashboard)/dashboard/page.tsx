@@ -26,9 +26,9 @@ export default function DashboardPage() {
   }, []);
 
   const getTaskStats = () => {
-    const completed = tasks.filter(task => task.status === 'completed').length;
-    const inProgress = tasks.filter(task => task.status === 'in_progress').length;
-    const todo = tasks.filter(task => task.status === 'not_started').length;
+    const completed = tasks.filter(task => task.status === 'DONE').length;
+    const inProgress = tasks.filter(task => task.status === 'IN_PROGRESS').length;
+    const todo = tasks.filter(task => task.status === 'TODO').length;
     return { completed, inProgress, todo };
   };
 

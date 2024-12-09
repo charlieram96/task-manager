@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  description String
+  status      String
+  departments String   // Stored as JSON string
+  dueDate     DateTime
+  notes       String?  // Optional notes field
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Department {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  fullName  String
+  overseers String     // Stored as JSON string containing array of overseer objects
+  documents Document[]
+  actionItems ActionItem[] @relation("ActionItemDepartments")
+}
+
+model Document {
+  id           String     @id @default(uuid())
+  name         String
+  fileName     String
+  contentType  String
+  size         Int
+  uploadedAt   DateTime   @default(now())
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  departmentId String
+}
+
+model Meeting {
+  id          String       @id @default(cuid())
+  title       String
+  date        DateTime
+  notes       String
+  actionItems ActionItem[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ActionItem {
+  id           String       @id @default(cuid())
+  description  String
+  dueDate      DateTime
+  meeting      Meeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meetingId    String
+  departments  Department[] @relation("ActionItemDepartments")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}

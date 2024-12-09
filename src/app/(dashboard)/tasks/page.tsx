@@ -144,9 +144,7 @@ export default function TasksPage() {
   const filteredTasks = tasks.filter(task => {
     const matchesDepartment = 
       filters.department === 'all' || 
-      (task.departments 
-        ? task.departments.includes(filters.department)
-        : task.department === filters.department);
+      (task.departments && task.departments.includes(filters.department));
     
     const matchesStatus = filters.status === 'all' || task.status === filters.status;
     

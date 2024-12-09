@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Department, Task as TaskType } from "@/lib/types";
+import { Department, Task as TaskType, Overseer } from "@/lib/types";
 
 interface Task extends Omit<TaskType, 'departments'> {
   departments?: string[];
@@ -39,7 +39,7 @@ const statusLabels = {
 export function TaskDetailsDialog({ task, departments, open, onOpenChange }: TaskDetailsDialogProps) {
   if (!task) return null;
 
-  const getDepartmentOverseers = (deptName: string): TaskType['overseers'] => {
+  const getDepartmentOverseers = (deptName: string): Overseer[] => {
     const dept = departments.find(d => d.name === deptName);
     if (!dept) return [];
     

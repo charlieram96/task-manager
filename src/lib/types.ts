@@ -1,7 +1,7 @@
 export interface Task {
   id: string;
   description: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  status: 'not_started' | 'in_progress' | 'completed' | 'blocked';
   priority: 'low' | 'medium' | 'high';
   dueDate: string;
   startDate: string;

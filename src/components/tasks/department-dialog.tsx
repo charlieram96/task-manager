@@ -26,55 +26,55 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Users, Plus, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-
-interface Department {
-  id: string;
-  name: string;
-  fullName: string;
-  overseers: string[];
-}
+import { Department } from '@/lib/types';
 
 const departmentSchema = z.object({
   name: z.string().min(1, 'Department name is required'),
   fullName: z.string().min(1, 'Full department name is required'),
-  overseers: z.string().min(1, 'At least one overseer is required'),
+  overseers: z.array(z.object({
+    name: z.string().min(1, 'Overseer name is required'),
+    email: z.string().email('Invalid email'),
+    phone: z.string().min(1, 'Phone number is required'),
+  })).min(1, 'At least one overseer is required'),
 });
+
+type DepartmentFormValues = z.infer<typeof departmentSchema>;
 
 interface DepartmentDialogProps {
   open: boolean;
-  onClose: () => void;
-  onSubmit: (data: Department) => void;
+  onOpenChange: (open: boolean) => void;
   departments: Department[];
+  onDepartmentsChange: (departments: Department[]) => void;
 }
 
 export function DepartmentDialog({
   open,
-  onClose,
-  onSubmit,
+  onOpenChange,
   departments,
+  onDepartmentsChange,
 }: DepartmentDialogProps) {
   const form = useForm({
     resolver: zodResolver(departmentSchema),
     defaultValues: {
       name: '',
       fullName: '',
-      overseers: '',
+      overseers: [],
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof departmentSchema>) => {
-    onSubmit({
+  const handleSubmit = (values: DepartmentFormValues) => {
+    onDepartmentsChange([...departments, {
       id: '',
       name: values.name,
       fullName: values.fullName,
-      overseers: values.overseers.split(',').map((s) => s.trim()),
-    });
+      overseers: values.overseers,
+    }]);
     form.reset();
-    onClose();
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add Department</DialogTitle>
@@ -134,7 +134,7 @@ export function DepartmentDialog({
             />
 
             <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" type="button" onClick={onClose}>
+              <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               <Button type="submit">Add Department</Button>

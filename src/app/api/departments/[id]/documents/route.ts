@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
-import { mkdir } from 'fs/promises';
+import { put } from '@vercel/blob';
 
-const UPLOAD_DIR = join(process.cwd(), 'uploads');
+const UPLOAD_DIR = '';
 
 // Ensure upload directory exists
 async function ensureUploadDir() {
   try {
-    await mkdir(UPLOAD_DIR, { recursive: true });
+    // Removed mkdir call as it's not needed with Vercel Blob Storage
   } catch (error) {
     console.error('Error creating upload directory:', error);
   }
@@ -46,23 +44,16 @@ export async function POST(
       );
     }
 
-    // Ensure upload directory exists
-    await ensureUploadDir();
+    // Upload to Vercel Blob Storage
+    const blob = await put(name, file, {
+      access: 'public',
+    });
 
-    // Generate unique filename
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = join(UPLOAD_DIR, fileName);
-
-    // Save file to disk
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
-
-    // Create document record in database
+    // Save document metadata to database
     const document = await prisma.document.create({
       data: {
         name,
-        fileName,
+        fileName: blob.url,
         contentType: file.type,
         size: file.size,
         departmentId,

@@ -49,7 +49,9 @@ const formSchema = z.object({
     required_error: "Due date is required",
   }),
   notes: z.string().optional(),
-  status: z.string().min(1, "Status is required"),
+  status: z.enum(['not_started', 'in_progress', 'completed', 'blocked'], {
+    required_error: "Status is required",
+  }),
 });
 
 export function TaskEditDialog({ task, departments, open, onOpenChange, onSave }: TaskEditDialogProps) {
@@ -73,6 +75,7 @@ export function TaskEditDialog({ task, departments, open, onOpenChange, onSave }
   if (!task) return null;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!task) return;
     onSave(task.id, {
       ...values,
       dueDate: format(values.dueDate, "yyyy-MM-dd"),

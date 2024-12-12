@@ -27,10 +27,23 @@ export default function TimelinePage() {
         const tasksData = await tasksResponse.json();
         const departmentsData = await departmentsResponse.json();
         
-        setTasks(tasksData);
-        setDepartments(departmentsData);
+        if (Array.isArray(tasksData)) {
+          setTasks(tasksData);
+        } else {
+          console.error('Invalid tasks data format');
+          setTasks([]);
+        }
+
+        if (Array.isArray(departmentsData)) {
+          setDepartments(departmentsData);
+        } else {
+          console.error('Invalid departments data format');
+          setDepartments([]);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
+        setTasks([]);
+        setDepartments([]);
       } finally {
         setIsLoading(false);
       }
@@ -39,9 +52,11 @@ export default function TimelinePage() {
     fetchData();
   }, []);
 
-  const filteredTasks = selectedDepartment === 'all' 
-    ? tasks 
-    : tasks.filter(task => task.departments && task.departments.includes(selectedDepartment));
+  const filteredTasks = Array.isArray(tasks) ? (
+    selectedDepartment === 'all' 
+      ? tasks 
+      : tasks.filter(task => task.departments && task.departments.includes(selectedDepartment))
+  ) : [];
 
   return (
     <div className="h-full p-8 space-y-4">
@@ -54,11 +69,11 @@ export default function TimelinePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((dept) => (
+              {Array.isArray(departments) ? departments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.name}>
                   {dept.name}
                 </SelectItem>
-              ))}
+              )) : null}
             </SelectContent>
           </Select>
         </div>

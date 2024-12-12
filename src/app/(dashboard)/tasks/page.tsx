@@ -47,14 +47,21 @@ export default function TasksPage() {
     try {
       const response = await fetch('/api/tasks');
       const data = await response.json();
-      setTasks(data);
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else if (data.error) {
+        throw new Error(data.error);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast({
         title: 'Error',
-        description: 'Failed to fetch tasks',
+        description: error instanceof Error ? error.message : 'Failed to fetch tasks',
         variant: 'destructive',
       });
+      setTasks([]); // Ensure tasks is always an array
     } finally {
       setLoading(false);
     }
@@ -135,7 +142,7 @@ export default function TasksPage() {
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = Array.isArray(tasks) ? tasks.filter(task => {
     const matchesDepartment = 
       filters.department === 'all' || 
       (task.departments && task.departments.includes(filters.department));
@@ -150,12 +157,12 @@ export default function TasksPage() {
         matchesMonth = taskMonth === filters.month;
       } catch (error) {
         console.error('Error parsing date:', error);
-        matchesMonth = false;
+        return false;
       }
     }
     
     return matchesDepartment && matchesStatus && matchesMonth;
-  });
+  }) : [];
 
   const months = Array.from(
     new Set(

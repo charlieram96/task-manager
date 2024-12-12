@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { join } from 'path';
-import { readFile } from 'fs/promises';
-import { headers } from 'next/headers';
-
-const UPLOAD_DIR = join(process.cwd(), 'uploads');
 
 export async function GET(
   request: NextRequest,
@@ -23,20 +18,8 @@ export async function GET(
       );
     }
 
-    const filePath = join(UPLOAD_DIR, document.fileName);
-    const fileBuffer = await readFile(filePath);
-
-    // Create response with appropriate headers
-    const response = new NextResponse(fileBuffer);
-    
-    // Set content type and disposition headers
-    response.headers.set('Content-Type', document.contentType);
-    response.headers.set(
-      'Content-Disposition',
-      `inline; filename="${document.name}${getFileExtension(document.fileName)}"`
-    );
-
-    return response;
+    // Redirect to the Vercel Blob Storage URL
+    return NextResponse.redirect(document.fileName);
   } catch (error) {
     console.error('Error downloading document:', error);
     return NextResponse.json(
@@ -44,9 +27,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-function getFileExtension(fileName: string): string {
-  const match = fileName.match(/\.[^.]*$/);
-  return match ? match[0] : '';
 }

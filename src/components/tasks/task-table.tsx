@@ -40,9 +40,9 @@ interface TaskTableProps {
 
 const statusColors = {
   not_started: 'bg-blue-400/90 hover:bg-blue-400',
-  in_progress: 'bg-amber-400/90 hover:bg-amber-400',
-  completed: 'bg-emerald-400/90 hover:bg-emerald-400',
-  blocked: 'bg-rose-400/90 hover:bg-rose-400',
+  in_progress: 'bg-green-500/90 hover:bg-green-500',
+  completed: 'bg-red-500/90 hover:bg-red-500',
+  blocked: 'bg-gray-900/90 hover:bg-gray-900',
 };
 
 const statusLabels = {
@@ -68,11 +68,11 @@ export function TaskTable({
       case 'not_started':
         return 'bg-blue-400/90 hover:bg-blue-400';
       case 'in_progress':
-        return 'bg-amber-400/90 hover:bg-amber-400';
+        return 'bg-green-500/90 hover:bg-green-500';
       case 'completed':
-        return 'bg-emerald-400/90 hover:bg-emerald-400';
+        return 'bg-red-500/90 hover:bg-red-500';
       case 'blocked':
-        return 'bg-rose-400/90 hover:bg-rose-400';
+        return 'bg-gray-900/90 hover:bg-gray-900';
       default:
         return 'bg-slate-500';
     }

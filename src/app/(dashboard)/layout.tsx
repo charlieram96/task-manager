@@ -21,10 +21,12 @@ export default function DashboardLayout({
 
   return (
     <div className="h-full relative">
-      <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-gray-900" style={{ height: '0px' }}>
+      <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-gray-900">
         <Navigation />
       </div>
-      <MobileNav />
+      <div className="block md:hidden">
+        <MobileNav />
+      </div>
       <main className="md:pl-72 min-h-screen">
         <div className="h-full pt-16 md:pt-4 px-4 sm:px-6 md:px-8">
           {children}

@@ -17,23 +17,24 @@ export async function GET() {
     // Parse JSON strings back to arrays and format the response
     const parsedDepartments = departments.map(dept => {
       try {
+        const overseers = dept.overseers ? JSON.parse(dept.overseers) : [];
         return {
           id: dept.id,
           name: dept.name,
           fullName: dept.fullName,
-          overseers: JSON.parse(dept.overseers),
-          documents: dept.documents,
-          actionItems: dept.actionItems,
+          overseers,
+          documents: dept.documents || [],
+          actionItems: dept.actionItems || [],
         };
       } catch (e) {
-        console.error('Error parsing department overseers:', e);
+        console.error(`Error parsing department ${dept.id}:`, e);
         return {
           id: dept.id,
           name: dept.name,
           fullName: dept.fullName,
           overseers: [],
-          documents: dept.documents,
-          actionItems: dept.actionItems,
+          documents: dept.documents || [],
+          actionItems: dept.actionItems || [],
         };
       }
     });
@@ -41,7 +42,16 @@ export async function GET() {
     return NextResponse.json(parsedDepartments);
   } catch (error) {
     console.error('Error fetching departments:', error);
-    return NextResponse.json({ error: 'Failed to fetch departments' }, { status: 500 });
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to fetch departments: ${error.message}` },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json(
+      { error: 'Failed to fetch departments: Unknown error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -71,8 +81,14 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating department:', error);
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to create department: ${error.message}` },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
-      { error: 'Failed to create department' },
+      { error: 'Failed to create department: Unknown error' },
       { status: 500 }
     );
   }

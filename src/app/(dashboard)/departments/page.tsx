@@ -73,14 +73,21 @@ export default function DepartmentsPage() {
     try {
       const response = await fetch('/api/departments');
       const data = await response.json();
-      setDepartments(data);
+      if (Array.isArray(data)) {
+        setDepartments(data);
+      } else if (data.error) {
+        throw new Error(data.error);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Error fetching departments:', error);
       toast({
         title: 'Error',
-        description: 'Failed to fetch departments',
+        description: error instanceof Error ? error.message : 'Failed to fetch departments',
         variant: 'destructive',
       });
+      setDepartments([]); // Ensure departments is always an array
     } finally {
       setIsLoading(false);
     }
@@ -226,30 +233,19 @@ export default function DepartmentsPage() {
   };
 
   const filteredDepartments = useMemo(() => {
-    if (!searchQuery.trim()) return departments;
+    if (!Array.isArray(departments)) return [];
     
-    const query = searchQuery.toLowerCase();
-    return departments.filter((dept) => {
-      // Check department name and full name
-      if (dept.name.toLowerCase().includes(query)) return true;
-      if (dept.fullName.toLowerCase().includes(query)) return true;
-      
-      // Check overseers
-      const overseers = dept.overseers || [];
-      const overseerMatch = overseers.some((overseer) => {
-        return (
-          overseer.name.toLowerCase().includes(query) ||
-          overseer.email.toLowerCase().includes(query) ||
-          overseer.phone.toLowerCase().includes(query)
-        );
-      });
-      if (overseerMatch) return true;
-      
-      // Check documents
-      const documents = departmentDocuments[dept.id] || [];
-      return documents.some((doc) => 
-        doc.name.toLowerCase().includes(query)
+    return departments.filter((department) => {
+      const matchesSearch = searchQuery === "" || 
+        department.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        department.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const docs = departmentDocuments[department.id];
+      const hasMatchingDocuments = Array.isArray(docs) && docs.some(doc =>
+        doc.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
+
+      return matchesSearch || hasMatchingDocuments;
     });
   }, [departments, searchQuery, departmentDocuments]);
 
@@ -277,111 +273,113 @@ export default function DepartmentsPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDepartments.map((department) => (
-          <Card key={department.id}>
-            <CardHeader className="relative">
-              <div className="flex flex-col gap-1">
-                <div className="text-lg font-semibold">{department.name}</div>
-                <div className="text-sm text-muted-foreground">{department.fullName}</div>
-              </div>
-              {isAdmin && (
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleUploadClick(department.id)}
-                  >
-                    <Upload className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openDialog(department)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setDepartmentToDelete(department);
-                      setDeleteDialogOpen(true);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+        {Array.isArray(filteredDepartments) ? (
+          filteredDepartments.map((department) => (
+            <Card key={department.id}>
+              <CardHeader className="relative">
+                <div className="flex flex-col gap-1">
+                  <div className="text-lg font-semibold">{department.name}</div>
+                  <div className="text-sm text-muted-foreground">{department.fullName}</div>
                 </div>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {department.overseers?.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="font-medium text-sm">Overseers:</div>
-                    <div className="grid gap-2">
-                      {department.overseers.map((overseer, index) => (
-                        <div
-                          key={index}
-                          className="flex flex-col gap-1 p-3 rounded-lg bg-muted"
-                        >
-                          <div className="font-medium">{overseer.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Mail className="w-4 h-4" />
-                              <a
-                                href={`mailto:${overseer.email}`}
-                                className="hover:underline"
-                              >
-                                {overseer.email}
-                              </a>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4" />
-                              <a
-                                href={`tel:${overseer.phone}`}
-                                className="hover:underline"
-                              >
-                                {overseer.phone}
-                              </a>
+                {isAdmin && (
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleUploadClick(department.id)}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openDialog(department)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setDepartmentToDelete(department);
+                        setDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {department.overseers?.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="font-medium text-sm">Overseers:</div>
+                      <div className="grid gap-2">
+                        {department.overseers.map((overseer, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-col gap-1 p-3 rounded-lg bg-muted"
+                          >
+                            <div className="font-medium">{overseer.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              <div className="flex items-center gap-2">
+                                <Mail className="w-4 h-4" />
+                                <a
+                                  href={`mailto:${overseer.email}`}
+                                  className="hover:underline"
+                                >
+                                  {overseer.email}
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                <a
+                                  href={`tel:${overseer.phone}`}
+                                  className="hover:underline"
+                                >
+                                  {overseer.phone}
+                                </a>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {departmentDocuments[department.id]?.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="font-medium text-sm">Documents:</div>
-                    <div className="grid gap-2">
-                      {departmentDocuments[department.id].map((doc: Document) => (
-                        <div
-                          key={doc.id}
-                          className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted hover:bg-muted/80 cursor-pointer transition-colors"
-                          onClick={() => handleDocumentClick(doc)}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              handleDocumentClick(doc);
-                            }
-                          }}
-                        >
-                          <FileText className="h-4 w-4" />
-                          <span className="flex-1">{doc.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            ({Math.round(doc.size / 1024)}KB)
-                          </span>
-                        </div>
-                      ))}
+                  {departmentDocuments[department.id]?.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="font-medium text-sm">Documents:</div>
+                      <div className="grid gap-2">
+                        {departmentDocuments[department.id].map((doc: Document) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted hover:bg-muted/80 cursor-pointer transition-colors"
+                            onClick={() => handleDocumentClick(doc)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                handleDocumentClick(doc);
+                              }
+                            }}
+                          >
+                            <FileText className="h-4 w-4" />
+                            <span className="flex-1">{doc.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              ({Math.round(doc.size / 1024)}KB)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : null}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
